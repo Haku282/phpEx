@@ -60,6 +60,16 @@ initial-scale=1.0">
 </head>
 
 <body>
+    <div class="container">
+        <div style="text-align: right; margin-bottom: 15px;">
+            Chào mừng, <strong><?php echo
+
+                                htmlspecialchars($_SESSION['user_name']); ?></strong>!
+
+            <a href="index.php?action=logout"
+                style="margin-left: 15px;">Đăng xuất</a>
+
+        </div>
         <div class="container">
             <h1>
                 <?php
