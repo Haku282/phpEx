@@ -16,10 +16,24 @@ class SinhvienModel
     }
 
     // Lấy tất cả sinh viên 
-    public function getAllStudents()
+    public function getAllStudents($keyword = null)
     {
-        $stmt = $this->conn->prepare("SELECT * FROM students 
-ORDER BY id DESC");
+        // Bắt đầu câu lệnh SQL
+        $sql = "SELECT * FROM students";
+        // Nếu có từ khóa tìm kiếm, thêm điều kiện WHERE
+        if ($keyword) {
+            // Sử dụng LIKE để tìm kiếm gần đúng
+            $sql .= " WHERE name LIKE :keyword";
+        }
+        $sql .= " ORDER BY id DESC";
+        $stmt = $this->conn->prepare($sql);
+        // Nếu có từ khóa, gán giá trị cho tham số :keyword
+        if ($keyword) {
+            // Thêm dấu % vào hai bên từ khóa để tìm kiếm bất kỳ vị trí nào trong chuỗi
+
+            $searchKeyword = "%{$keyword}%";
+            $stmt->bindParam(':keyword', $searchKeyword);
+        }
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -82,9 +96,7 @@ phone = :phone WHERE id = :id"
     // HÀM MỚI: Xóa một sinh viên theo ID (bài 4)
     public function deleteStudent($id)
     {
-        $stmt = $this->conn->prepare("DELETE FROM students WHERE
-
-id = :id");
+        $stmt = $this->conn->prepare("DELETE FROM students WHERE id = :id");
 
         $stmt->bindParam(':id', $id);
         if ($stmt->execute()) {

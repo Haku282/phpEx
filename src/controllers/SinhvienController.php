@@ -16,8 +16,13 @@ class SinhvienController
     // Hiển thị danh sách sinh viên 
     public function index()
     {
-        $students = $this->sinhvienModel->getAllStudents();
-        // Nạp file view để hiển thị 
+        // THÊM MỚI (bài 5) Lấy từ khóa tìm kiếm từ URL, nếu không có thì là null
+        $keyword = $_GET['keyword'] ?? null;
+        // Gọi model để lấy danh sách sinh viên (có thể có hoặc không có từ khóa)
+        $students = $this->sinhvienModel->getAllStudents($keyword);
+
+        // Nạp file view và truyền cả danh sách sinh viên lẫn từ khóa ra
+
         require_once __DIR__ . '/../../views/sinhvien_list.php';
     }
 
