@@ -28,3 +28,16 @@ Sau 4 bài thực hành, các em đã nắm vững các kiến thức sau:
 Statements.
 ❖ Xây dựng các chức năng Create, Read, Update, Delete.
 ❖ Xử lý form, tham số trên URL và chuyển hướng trang.
+
+Bài 5
+Tóm tắt luồng hoạt động
+1. Người dùng nhập tên vào form tìm kiếm và nhấn Enter.
+2. Trình duyệt gửi yêu cầu GET đến index.php với tham số keyword trên URL.
+3. Router (index.php) gọi phương thức index() của SinhvienController.
+4. SinhvienController lấy keyword từ $_GET và gọi getAllStudents($keyword) trong
+SinhvienModel.
+5. SinhvienModel xây dựng câu lệnh SQL với WHERE name LIKE ... và thực thi để
+lấy kết quả.
+6. SinhvienController nhận kết quả và truyền nó cùng với $keyword cho
+sinhvien_list.php view.
+7. View hiển thị danh sách kết quả và điền lại $keyword vào ô tìm kiếm.

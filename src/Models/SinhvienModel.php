@@ -16,28 +16,45 @@ class SinhvienModel
     }
 
     // Lấy tất cả sinh viên 
-    public function getAllStudents($keyword = null)
+    public function getStudents($keyword = null, $limit = 5, $offset = 0)
     {
-        // Bắt đầu câu lệnh SQL
-        $sql = "SELECT * FROM students";
-        // Nếu có từ khóa tìm kiếm, thêm điều kiện WHERE
+        // --- BƯỚC 1: ĐẾM TỔNG SỐ BẢN GHI ---
+        $sqlCount = "SELECT COUNT(*) FROM students";
+        $params = [];
         if ($keyword) {
-            // Sử dụng LIKE để tìm kiếm gần đúng
-            $sql .= " WHERE name LIKE :keyword";
+            $sqlCount .= " WHERE name LIKE :keyword OR email LIKE :keyword OR phone LIKE :keyword";
+            $params[':keyword'] = "%{$keyword}%";
         }
-        $sql .= " ORDER BY id DESC";
-        $stmt = $this->conn->prepare($sql);
-        // Nếu có từ khóa, gán giá trị cho tham số :keyword
+        $stmtCount = $this->conn->prepare($sqlCount);
+        $stmtCount->execute($params);
+        $totalRecords = $stmtCount->fetchColumn();
+        // --- BƯỚC 2: LẤY DỮ LIỆU SINH VIÊN THEO PHÂN TRANG ---
+        $sqlData = "SELECT * FROM  students";
         if ($keyword) {
-            // Thêm dấu % vào hai bên từ khóa để tìm kiếm bất kỳ vị trí nào trong chuỗi
-
-            $searchKeyword = "%{$keyword}%";
-            $stmt->bindParam(':keyword', $searchKeyword);
+            $sqlData .= " WHERE name LIKE :keyword OR email LIKE :keyword OR phone LIKE :keyword";
         }
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $sqlData .= " ORDER BY id DESC LIMIT :limit OFFSET :offset";
+        $stmtData = $this->conn->prepare($sqlData);
+        // Gán các tham số cho câu lệnh lấy dữ liệu
+        if ($keyword) {
+            $stmtData->bindParam(
+                ':keyword',
+                $params[':keyword']
+            );
+        }
+        $stmtData->bindParam(':limit', $limit, PDO::PARAM_INT);
+        $stmtData->bindParam(
+            ':offset',
+            $offset,
+            PDO::PARAM_INT
+        );
+        $stmtData->execute();
+        $students = $stmtData->fetchAll(PDO::FETCH_ASSOC);
+        return [
+            'data' => $students,
+            'total' => $totalRecords
+        ];
     }
-
     // Thêm sinh viên mới 
     public function addStudent($name, $email, $phone)
     {
