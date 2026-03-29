@@ -1,6 +1,6 @@
 <?php 
 // src/Database.php 
-namespace Vohoq\Bai01QuanlySv; 
+namespace vohoq\Bai01QuanlySv; 
  
 use PDO; 
 use PDOException; 

@@ -1,8 +1,8 @@
 <?php
 // src/Models/SinhvienModel.php 
-namespace Vohoq\Bai01QuanlySv\Models;
+namespace vohoq\Bai01QuanlySv\Models;
 
-use Vohoq\Bai01QuanlySv\Database;
+use vohoq\Bai01QuanlySv\Database;
 
 use PDO;
 
@@ -55,21 +55,22 @@ class SinhvienModel
             'total' => $totalRecords
         ];
     }
-    // Thêm sinh viên mới 
-    public function addStudent($name, $email, $phone)
+    // Thêm sinh viên mới (bổ sung avatar)
+    public function addStudent($name, $email, $phone, $avatar = null)
     {
-        $stmt = $this->conn->prepare("INSERT INTO students (name, 
-email, phone) VALUES (:name, :email, :phone)");
+        $stmt = $this->conn->prepare("INSERT INTO students (name, email, phone, avatar) VALUES (:name, :email, :phone, :avatar)");
 
         // Làm sạch dữ liệu 
         $name = htmlspecialchars(strip_tags($name));
         $email = htmlspecialchars(strip_tags($email));
         $phone = htmlspecialchars(strip_tags($phone));
+        $avatar = $avatar ? htmlspecialchars(strip_tags($avatar)) : null;
 
         // Gán dữ liệu vào câu lệnh 
         $stmt->bindParam(':name', $name);
         $stmt->bindParam(':email', $email);
         $stmt->bindParam(':phone', $phone);
+        $stmt->bindValue(':avatar', $avatar, $avatar === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
 
         if ($stmt->execute()) {
             return true;
@@ -88,14 +89,19 @@ WHERE id = :id");
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
     // HÀM THÊM MỚI: Cập nhật thông tin sinh viên (bài 03)
-    public function updateStudent($id, $name, $email, $phone)
+    public function updateStudent($id, $name, $email, $phone, $avatar = null)
     {
-        $stmt = $this->conn->prepare(
-            "UPDATE students SET name = :name, email = :email,
+        // Nếu có avatar mới, cập nhật cả trường avatar; nếu không, giữ nguyên avatar cũ
+        if ($avatar !== null) {
+            $stmt = $this->conn->prepare(
+                "UPDATE students SET name = :name, email = :email, phone = :phone, avatar = :avatar WHERE id = :id"
+            );
+        } else {
+            $stmt = $this->conn->prepare(
+                "UPDATE students SET name = :name, email = :email, phone = :phone WHERE id = :id"
+            );
+        }
 
-phone = :phone WHERE id = :id"
-
-        );
         // Làm sạch dữ liệu
         $name = htmlspecialchars(strip_tags($name));
         $email = htmlspecialchars(strip_tags($email));
@@ -105,6 +111,11 @@ phone = :phone WHERE id = :id"
         $stmt->bindParam(':name', $name);
         $stmt->bindParam(':email', $email);
         $stmt->bindParam(':phone', $phone);
+        if ($avatar !== null) {
+            $avatarClean = htmlspecialchars(strip_tags($avatar));
+            $stmt->bindParam(':avatar', $avatarClean);
+        }
+
         if ($stmt->execute()) {
             return true;
         }

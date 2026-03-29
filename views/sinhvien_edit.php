@@ -52,7 +52,12 @@ initial-scale=1.0">
 <body>
     <div class="container">
         <h1>Chỉnh sửa thông tin sinh viên</h1>
-        <form action="index.php?action=update" method="POST">
+        <div>
+            <p>Ảnh đại diện hiện tại:</p>
+            <img src="upload/avatars/<?php echo $student['avatar'] ??
+                                            'default-avatar.png'; ?>" alt="Current Avatar" width="100" height="100">
+        </div>
+        <form action="index.php?action=update" method="POST" enctype="multipart/form-data">
             <input type="hidden" name="id" value="<?php echo
 
                                                     $student['id']; ?>">
@@ -71,6 +76,8 @@ initial-scale=1.0">
             <input type="text" id="phone" name="phone"
                 value="<?php echo htmlspecialchars($student['phone']); ?>"
                 required>
+            <label for="avatar">Thay đổi ảnh đại diện:</label>
+            <input type="file" id="avatar" name="avatar" accept="image/*">
 
             <button type="submit">Lưu thay đổi</button>
         </form>

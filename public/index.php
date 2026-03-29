@@ -4,8 +4,8 @@ session_start();
 // Nạp file autoload của Composer 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use Vohoq\Bai01QuanlySv\Controllers\SinhvienController;
-use Vohoq\Bai01QuanlySv\Controllers\UserController;
+use vohoq\Bai01QuanlySv\Controllers\SinhvienController;
+use vohoq\Bai01QuanlySv\Controllers\UserController;
 // Simple Router 
 $action = $_GET['action'] ?? 'index';
 // Danh sách các action không yêu cầu đăng nhập

@@ -1,3 +1,6 @@
+<?php
+
+use vohoq\Bai01QuanlySv\Core\FlashMessage; ?>
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -56,15 +59,38 @@ initial-scale=1.0">
         th {
             background-color: #f2f2f2;
         }
+
+        /* views/sinhvien_list.php -> bên trong thẻ <style> */
+        .flash-message {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            color: #fff;
+            font-weight: bold;
+            opacity: 1;
+            transition: opacity 0.5s ease-out;
+            /* Hiệu ứng mờ dần */
+        }
+
+        .flash-success {
+            background-color: green;
+        }
+
+        .flash-error {
+            background-color: red;
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
+        <?php FlashMessage::display(); // THÊM DÒNG NÀY ĐỂ HIỂN THỊ THÔNG BÁO 
+        ?>
+    </div>
+    <div class="container">
         <div style="text-align: right; margin-bottom: 15px;">
-            Chào mừng, <strong><?php echo
 
-                                htmlspecialchars($_SESSION['user_name']); ?></strong>!
+            Chào mừng, <strong><?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Khách'); ?></strong>!
 
             <a href="index.php?action=logout"
                 style="margin-left: 15px;">Đăng xuất</a>
@@ -101,12 +127,15 @@ initial-scale=1.0">
             <div class="container">
                 <h1>Quản lý sinh viên</h1>
 
-                <form action="index.php?action=add" method="POST">
-                    <h3>Thêm sinh viên mới</h3>
-                    <input type="text" name="name" placeholder="Họ và Tên" required>
-                    <input type="email" name="email" placeholder="Email" required>
-                    <input type="text" name="phone" placeholder="Số điện thoại" required>
-                    <button type="submit">Thêm mới</button>
+                <form action="index.php?action=add" method="POST" enctype="multipart/form-data">
+
+                        <h3>Thêm sinh viên mới</h3>
+                        <input type="text" name="name" placeholder="Họ và Tên" required>
+                        <input type="email" name="email" placeholder="Email" required>
+                        <input type="text" name="phone" placeholder="Số điện thoại" required>
+                        <label for="avatar">Ảnh đại diện:</label>
+                        <input type="file" id="avatar" name="avatar" accept="image/*">
+                        <button type="submit">Thêm mới</button>
                 </form>
 
                 <h2>Danh sách sinh viên</h2>
@@ -146,6 +175,7 @@ initial-scale=1.0">
                 <thead>
                     <tr>
                         <th>ID</th>
+                        <th>Ảnh đại diện</th>
                         <th>Họ và Tên</th>
                         <th>Email</th>
                         <th>Số điện thoại</th>
@@ -156,6 +186,18 @@ initial-scale=1.0">
                     <?php foreach ($students as $student): ?>
                         <tr>
                             <td><?php echo $student['id']; ?></td>
+                            <td>
+                                <?php if (!empty($student['avatar'])): ?>
+                                    <img src="upload/avatars/<?php echo $student['avatar']; ?>"
+
+                                        alt="Avatar" width="50" height="50" style="border-radius: 50%;">
+
+                                <?php else: ?>
+                                    <img src="upload/avatars/default-avatar.png" alt="Avatar"
+
+                                        width="50" height="50" style="border-radius: 50%;">
+                                <?php endif; ?>
+                            </td>
                             <td><?php echo
 
                                 htmlspecialchars($student['name']); ?></td>
@@ -183,6 +225,23 @@ initial-scale=1.0">
                     <?php endif; ?>
                 </tbody>
             </table>
+            <script>
+                // Lấy tất cả các phần tử flash message
+                const flashMessages = document.querySelectorAll('.flash-message');
+                // Nếu có thông báo, đặt một bộ đếm thời gian để ẩn nó sau 5 giây
+                if (flashMessages.length > 0) {
+                    setTimeout(() => {
+                        flashMessages.forEach(function(message) {
+                            // Làm cho thông báo mờ dần trước khi xóa
+                            message.style.opacity = '0';
+                            // Xóa hẳn phần tử khỏi DOM sau khi hiệu ứng mờ kết thúc
+                            setTimeout(() => {
+                                message.style.display = 'none';
+                            }, 500); // 0.5 giây, khớp với transition của CSS
+                        });
+                    }, 5000); // 5000 milliseconds = 5 giây
+                }
+            </script>
 </body>
 
 </html>

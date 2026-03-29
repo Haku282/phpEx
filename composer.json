@@ -1,9 +1,9 @@
 {
-    "name": "Vohoq/bai01_quanly_sv",
+    "name": "vohoq/bai01_quanly_sv",
     "description": "Hien thi danh sach sinh vien",
     "autoload": {
         "psr-4": {
-            "Vohoq\\Bai01QuanlySv\\": "src/"
+            "vohoq\\Bai01QuanlySv\\": "src/"
         }
     },
     "authors": [

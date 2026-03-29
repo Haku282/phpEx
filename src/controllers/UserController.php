@@ -1,8 +1,8 @@
 <?php
 // src/Controllers/UserController.php
-namespace Vohoq\Bai01QuanlySv\Controllers;
+namespace vohoq\Bai01QuanlySv\Controllers;
 
-use Vohoq\Bai01QuanlySv\Models\UserModel;
+use vohoq\Bai01QuanlySv\Models\UserModel;
 
 class UserController
 {

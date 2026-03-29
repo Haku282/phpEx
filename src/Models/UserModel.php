@@ -1,8 +1,8 @@
 <?php
 // src/Models/UserModel.php
-namespace Vohoq\Bai01QuanlySv\Models;
+namespace vohoq\Bai01QuanlySv\Models;
 
-use Vohoq\Bai01QuanlySv\Database;
+use vohoq\Bai01QuanlySv\Database;
 use PDO;
 
 class UserModel

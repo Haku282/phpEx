@@ -1,8 +1,9 @@
 <?php
 // src/Controllers/SinhvienController.php 
-namespace Vohoq\Bai01QuanlySv\Controllers;
+namespace vohoq\Bai01QuanlySv\Controllers;
 
-use Vohoq\Bai01QuanlySv\Models\SinhvienModel;
+use vohoq\Bai01QuanlySv\Models\SinhvienModel;
+use vohoq\Bai01QuanlySv\Core\FlashMessage;
 
 class SinhvienController
 {
@@ -49,13 +50,37 @@ class SinhvienController
 
             if (
                 !empty($name) && !empty($email) &&
+
                 !empty($phone)
             ) {
-                $this->sinhvienModel->addStudent(
-                    $name,
-                    $email,
-                    $phone
-                );
+
+                // Xử lý upload avatar nếu có
+                $avatarFilename = null;
+                if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
+                    $uploadDir = __DIR__ . '/../../upload/avatars/';
+                    if (!is_dir($uploadDir)) {
+                        mkdir($uploadDir, 0755, true);
+                    }
+                    $tmpName = $_FILES['avatar']['tmp_name'];
+                    $origName = basename($_FILES['avatar']['name']);
+                    $ext = strtolower(pathinfo($origName, PATHINFO_EXTENSION));
+                    $allowed = ['jpg', 'jpeg', 'png', 'gif'];
+                    if (in_array($ext, $allowed) && is_uploaded_file($tmpName)) {
+                        $avatarFilename = uniqid('av_') . '.' . $ext;
+                        $dest = $uploadDir . $avatarFilename;
+                        if (!move_uploaded_file($tmpName, $dest)) {
+                            $avatarFilename = null;
+                        }
+                    }
+                }
+
+                $this->sinhvienModel->addStudent($name, $email, $phone, $avatarFilename);
+
+                // Đặt thông báo thành công
+                FlashMessage::set('student_action', 'Thêm sinh viên thành công!', 'success');
+            } else {
+                // Đặt thông báo lỗi
+                FlashMessage::set('student_action', 'Thêm sinh viên thất bại!', 'error');
             }
         }
         // Sau khi thêm, chuyển hướng về trang danh sách 
@@ -90,13 +115,41 @@ class SinhvienController
                 !empty($phone)
             ) {
 
-                $this->sinhvienModel->updateStudent(
-                    $id,
-                    $name,
+                // Lấy thông tin cũ để xóa file cũ nếu cần
+                $existing = $this->sinhvienModel->getStudentById($id);
 
-                    $email,
-                    $phone
-                );
+                $avatarFilename = null;
+                if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
+                    $uploadDir = __DIR__ . '/../../upload/avatars/';
+                    if (!is_dir($uploadDir)) {
+                        mkdir($uploadDir, 0755, true);
+                    }
+                    $tmpName = $_FILES['avatar']['tmp_name'];
+                    $origName = basename($_FILES['avatar']['name']);
+                    $ext = strtolower(pathinfo($origName, PATHINFO_EXTENSION));
+                    $allowed = ['jpg', 'jpeg', 'png', 'gif'];
+                    if (in_array($ext, $allowed) && is_uploaded_file($tmpName)) {
+                        $avatarFilename = uniqid('av_') . '.' . $ext;
+                        $dest = $uploadDir . $avatarFilename;
+                        if (move_uploaded_file($tmpName, $dest)) {
+                            // xóa file cũ nếu không phải default
+                            if (!empty($existing['avatar']) && $existing['avatar'] !== 'default-avatar.png') {
+                                $oldFile = $uploadDir . $existing['avatar'];
+                                if (is_file($oldFile)) {
+                                    @unlink($oldFile);
+                                }
+                            }
+                        } else {
+                            $avatarFilename = null;
+                        }
+                    }
+                }
+
+                $this->sinhvienModel->updateStudent($id, $name, $email, $phone, $avatarFilename);
+
+                FlashMessage::set('student_action', 'Cập nhật thông tin thành công!', 'success');
+            } else {
+                FlashMessage::set('student_action', 'Cập nhật thất bại!', 'error');
             }
         }
         // Sau khi cập nhật, chuyển hướng về trang danh sách
@@ -107,14 +160,23 @@ class SinhvienController
     public function delete()
     {
         $id = $_GET['id'] ?? null;
-        if (!$id) {
-            // Nếu không có id, không làm gì cả và quay về trang chủ
+        if ($id) {
+            // Xóa file avatar nếu tồn tại
+            $existing = $this->sinhvienModel->getStudentById($id);
+            $uploadDir = __DIR__ . '/../../upload/avatars/';
+            if (!empty($existing['avatar']) && $existing['avatar'] !== 'default-avatar.png') {
+                $file = $uploadDir . $existing['avatar'];
+                if (is_file($file)) {
+                    @unlink($file);
+                }
+            }
 
-            header('Location: index.php');
-            exit();
+            if ($this->sinhvienModel->deleteStudent($id)) {
+                FlashMessage::set('student_action', 'Xóa sinh viên thành công!', 'success');
+            } else {
+                FlashMessage::set('student_action', 'Xóa thất bại!', 'error');
+            }
         }
-        // Gọi model để thực hiện xóa
-        $this->sinhvienModel->deleteStudent($id);
         // Sau khi xóa, chuyển hướng người dùng về lại trang danh sách
 
         header('Location: index.php');
