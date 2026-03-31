@@ -6,6 +6,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use vohoq\Bai01QuanlySv\Controllers\SinhvienController;
 use vohoq\Bai01QuanlySv\Controllers\UserController;
+use vohoq\Bai01QuanlySv\Controllers\PageController;
 // Simple Router 
 $action = $_GET['action'] ?? 'index';
 // Danh sách các action được bảo vệ (yêu cầu đăng nhập)
@@ -25,7 +26,7 @@ if (
     exit();
 }
 // Danh sách các action không yêu cầu đăng nhập
-$public_actions = ['login', 'register', 'do_login', 'do_register',];
+$public_actions = ['login', 'register', 'do_login', 'do_register', 'contact', 'submit_contact'];
 // Khởi tạo controller dựa trên action
 if (in_array($action, [
     'login',
@@ -35,6 +36,8 @@ if (in_array($action, [
     'logout'
 ])) {
     $controller = new UserController();
+} elseif (in_array($action, ['contact', 'submit_contact'])) { // <--THÊM ELSEIF
+    $controller = new PageController();
 } else {
     $controller = new SinhvienController();
 }
@@ -72,6 +75,14 @@ switch ($action) {
         $controller->logout();
         break;
     case 'index':
+        $controller->index();
+        break;
+    case 'contact':
+        $controller->showContactForm();
+        break;
+    case 'submit_contact':
+        $controller->submitContact();
+        break;
     default:
         $controller = new SinhvienController();
         $controller->index();
