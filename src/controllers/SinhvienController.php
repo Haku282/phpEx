@@ -47,6 +47,9 @@ class SinhvienController
             $name = $_POST['name'] ?? '';
             $email = $_POST['email'] ?? '';
             $phone = $_POST['phone'] ?? '';
+            $course = $_POST['course'] ?? '';
+            $class_name = $_POST['class_name'] ?? '';
+            $major = $_POST['major'] ?? '';
 
             if (
                 !empty($name) && !empty($email) &&
@@ -74,7 +77,7 @@ class SinhvienController
                     }
                 }
 
-                $this->sinhvienModel->addStudent($name, $email, $phone, $avatarFilename);
+                $this->sinhvienModel->addStudent($name, $email, $phone, $course, $class_name, $major, $avatarFilename);
 
                 // Đặt thông báo thành công
                 FlashMessage::set('student_action', 'Thêm sinh viên thành công!', 'success');
@@ -113,6 +116,9 @@ class SinhvienController
             $name = $_POST['name'] ?? '';
             $email = $_POST['email'] ?? '';
             $phone = $_POST['phone'] ?? '';
+            $course = $_POST['course'] ?? '';
+            $class_name = $_POST['class_name'] ?? '';
+            $major = $_POST['major'] ?? '';
             if (
                 $id && !empty($name) && !empty($email) &&
 
@@ -149,7 +155,7 @@ class SinhvienController
                     }
                 }
 
-                $this->sinhvienModel->updateStudent($id, $name, $email, $phone, $avatarFilename);
+                $this->sinhvienModel->updateStudent($id, $name, $email, $phone, $course, $class_name, $major, $avatarFilename);
 
                 FlashMessage::set('student_action', 'Cập nhật thông tin thành công!', 'success');
             } else {
@@ -185,6 +191,24 @@ class SinhvienController
 
         header('Location: index.php');
         exit();
+    }
+    public function detail()
+    {
+        $id = $_GET['id'] ?? null;
+        if (!$id) {
+            FlashMessage::set('student_action', 'ID sinh viên không hợp lệ.', 'error');
+            header('Location: index.php');
+            exit();
+        }
+        // Tái sử dụng hàm getStudentById đã có
+        $student = $this->sinhvienModel->getStudentById($id);
+        if (!$student) {
+            FlashMessage::set('student_action', 'Không tìm thấy sinh viên.', 'error');
+            header('Location: index.php');
+            exit();
+        }
+        // Nạp file view chi tiết và truyền dữ liệu sinh viên
+        require_once __DIR__ . '/../../views/detail.php';
     }
     public function dashboard()
     {

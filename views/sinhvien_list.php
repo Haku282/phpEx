@@ -164,6 +164,9 @@ initial-scale=1.0">
                     <input type="text" name="name" placeholder="Họ và Tên" required>
                     <input type="email" name="email" placeholder="Email" required>
                     <input type="text" name="phone" placeholder="Số điện thoại" required>
+                    <input type="text" name="course" placeholder="Khóa học">
+                    <input type="text" name="class_name" placeholder="Lớp học">
+                    <input type="text" name="major" placeholder="Ngành học">
                     <label for="avatar">Ảnh đại diện:</label>
                     <input type="file" id="avatar" name="avatar" accept="image/*">
                     <button type="submit">Thêm mới</button>
@@ -210,6 +213,9 @@ initial-scale=1.0">
                         <th>Họ và Tên</th>
                         <th>Email</th>
                         <th>Số điện thoại</th>
+                        <th>Khóa học</th>
+                        <th>Lớp học</th>
+                        <th>Ngành học</th>
                         <th>Hành động</th>
                     </tr>
                 </thead>
@@ -229,9 +235,13 @@ initial-scale=1.0">
                                         width="50" height="50" style="border-radius: 50%;">
                                 <?php endif; ?>
                             </td>
-                            <td><?php echo
+                            <td>
+                                <a href="index.php?action=detail&id=<?php echo $student['id']; ?>">
+                                    <?php echo
 
-                                htmlspecialchars($student['name']); ?></td>
+                                    htmlspecialchars($student['name']); ?>
+                                </a>
+                            </td>
 
                             <td><?php echo
 
@@ -240,6 +250,12 @@ initial-scale=1.0">
                             <td><?php echo
 
                                 htmlspecialchars($student['phone']); ?></td>
+
+                            <td><?php echo htmlspecialchars($student['course'] ?? ''); ?></td>
+
+                            <td><?php echo htmlspecialchars($student['class_name'] ?? ''); ?></td>
+
+                            <td><?php echo htmlspecialchars($student['major'] ?? ''); ?></td>
                             <td>
                                 <a href="index.php?action=edit&id=<?php echo $student['id']; ?>">Sửa</a>
 

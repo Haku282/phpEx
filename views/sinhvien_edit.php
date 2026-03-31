@@ -77,6 +77,19 @@ initial-scale=1.0">
             <input type="text" id="phone" name="phone"
                 value="<?php echo htmlspecialchars($studentData['phone'] ?? ''); ?>"
                 required>
+
+            <label for="course">Khóa học:</label>
+            <input type="text" id="course" name="course"
+                value="<?php echo htmlspecialchars($studentData['course'] ?? ''); ?>">
+
+            <label for="class_name">Lớp học:</label>
+            <input type="text" id="class_name" name="class_name"
+                value="<?php echo htmlspecialchars($studentData['class_name'] ?? ''); ?>">
+
+            <label for="major">Ngành học:</label>
+            <input type="text" id="major" name="major"
+                value="<?php echo htmlspecialchars($studentData['major'] ?? ''); ?>">
+
             <label for="avatar">Thay đổi ảnh đại diện:</label>
             <input type="file" id="avatar" name="avatar" accept="image/*">
 

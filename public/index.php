@@ -16,7 +16,8 @@ $protected_actions = [
     'update',
     'delete',
     'add',
-    'dashboard'
+    'dashboard',
+    'detail'
 ];
 if (
     in_array($action, $protected_actions) &&
@@ -82,6 +83,9 @@ switch ($action) {
         break;
     case 'submit_contact':
         $controller->submitContact();
+        break;
+    case 'detail':
+        $controller->detail();
         break;
     default:
         $controller = new SinhvienController();

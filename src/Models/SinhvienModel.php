@@ -96,25 +96,31 @@ class SinhvienModel
         ];
     }
     // Thêm sinh viên mới (bổ sung avatar)
-    public function addStudent($name, $email, $phone, $avatar = null)
+    public function addStudent($name, $email, $phone, $course = null, $class_name = null, $major = null, $avatar = null)
     {
         $avatarColumn = $this->getAvatarColumnName();
         if ($avatarColumn) {
-            $stmt = $this->conn->prepare("INSERT INTO students (name, email, phone, {$avatarColumn}) VALUES (:name, :email, :phone, :avatar)");
+            $stmt = $this->conn->prepare("INSERT INTO students (name, email, phone, course, class_name, major, {$avatarColumn}) VALUES (:name, :email, :phone, :course, :class_name, :major, :avatar)");
         } else {
-            $stmt = $this->conn->prepare("INSERT INTO students (name, email, phone) VALUES (:name, :email, :phone)");
+            $stmt = $this->conn->prepare("INSERT INTO students (name, email, phone, course, class_name, major) VALUES (:name, :email, :phone, :course, :class_name, :major)");
         }
 
         // Làm sạch dữ liệu 
         $name = htmlspecialchars(strip_tags($name));
         $email = htmlspecialchars(strip_tags($email));
         $phone = htmlspecialchars(strip_tags($phone));
+        $course = $course ? htmlspecialchars(strip_tags($course)) : null;
+        $class_name = $class_name ? htmlspecialchars(strip_tags($class_name)) : null;
+        $major = $major ? htmlspecialchars(strip_tags($major)) : null;
         $avatar = $avatar ? htmlspecialchars(strip_tags($avatar)) : null;
 
         // Gán dữ liệu vào câu lệnh 
         $stmt->bindParam(':name', $name);
         $stmt->bindParam(':email', $email);
         $stmt->bindParam(':phone', $phone);
+        $stmt->bindParam(':course', $course);
+        $stmt->bindParam(':class_name', $class_name);
+        $stmt->bindParam(':major', $major);
         if ($avatarColumn) {
             $stmt->bindValue(':avatar', $avatar, $avatar === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
         }
@@ -138,17 +144,17 @@ class SinhvienModel
         return $this->normalizeAvatarField($student);
     }
     // HÀM THÊM MỚI: Cập nhật thông tin sinh viên (bài 03)
-    public function updateStudent($id, $name, $email, $phone, $avatar = null)
+    public function updateStudent($id, $name, $email, $phone, $course = null, $class_name = null, $major = null, $avatar = null)
     {
         $avatarColumn = $this->getAvatarColumnName();
         // Nếu có avatar mới, cập nhật cả trường avatar; nếu không, giữ nguyên avatar cũ
         if ($avatar !== null && $avatarColumn) {
             $stmt = $this->conn->prepare(
-                "UPDATE students SET name = :name, email = :email, phone = :phone, {$avatarColumn} = :avatar WHERE id = :id"
+                "UPDATE students SET name = :name, email = :email, phone = :phone, course = :course, class_name = :class_name, major = :major, {$avatarColumn} = :avatar WHERE id = :id"
             );
         } else {
             $stmt = $this->conn->prepare(
-                "UPDATE students SET name = :name, email = :email, phone = :phone WHERE id = :id"
+                "UPDATE students SET name = :name, email = :email, phone = :phone, course = :course, class_name = :class_name, major = :major WHERE id = :id"
             );
         }
 
@@ -156,11 +162,17 @@ class SinhvienModel
         $name = htmlspecialchars(strip_tags($name));
         $email = htmlspecialchars(strip_tags($email));
         $phone = htmlspecialchars(strip_tags($phone));
+        $course = $course ? htmlspecialchars(strip_tags($course)) : null;
+        $class_name = $class_name ? htmlspecialchars(strip_tags($class_name)) : null;
+        $major = $major ? htmlspecialchars(strip_tags($major)) : null;
         // Gán dữ liệu vào câu lệnh
         $stmt->bindParam(':id', $id);
         $stmt->bindParam(':name', $name);
         $stmt->bindParam(':email', $email);
         $stmt->bindParam(':phone', $phone);
+        $stmt->bindParam(':course', $course);
+        $stmt->bindParam(':class_name', $class_name);
+        $stmt->bindParam(':major', $major);
         if ($avatar !== null && $avatarColumn) {
             $avatarClean = htmlspecialchars(strip_tags($avatar));
             $stmt->bindParam(':avatar', $avatarClean);
