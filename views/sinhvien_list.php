@@ -79,6 +79,34 @@ initial-scale=1.0">
         .flash-error {
             background-color: red;
         }
+
+        .pagination {
+            margin-top: 20px;
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .pagination a,
+        .pagination span {
+            display: inline-block;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #333;
+            background: #fff;
+        }
+
+        .pagination .active {
+            background: #007bff;
+            color: #fff;
+            border-color: #007bff;
+        }
+
+        .pagination a:hover {
+            background: #f3f3f3;
+        }
     </style>
 </head>
 
@@ -120,6 +148,9 @@ initial-scale=1.0">
                     <a href="index.php" style="padding: 8px 12px;
                         background-color: #6c757d; color: white; text-decoration: none;
                         border-radius: 3px;">Reset</a>
+                    <a href="index.php?action=dashboard" style="padding: 8px 12px;
+                        background-color: #17a2b8; color: white; text-decoration: none;
+                        border-radius: 3px;">Xem Thống kê</a>
                 </form>
                 <table>
                 </table>
@@ -129,13 +160,13 @@ initial-scale=1.0">
 
                 <form action="index.php?action=add" method="POST" enctype="multipart/form-data">
 
-                        <h3>Thêm sinh viên mới</h3>
-                        <input type="text" name="name" placeholder="Họ và Tên" required>
-                        <input type="email" name="email" placeholder="Email" required>
-                        <input type="text" name="phone" placeholder="Số điện thoại" required>
-                        <label for="avatar">Ảnh đại diện:</label>
-                        <input type="file" id="avatar" name="avatar" accept="image/*">
-                        <button type="submit">Thêm mới</button>
+                    <h3>Thêm sinh viên mới</h3>
+                    <input type="text" name="name" placeholder="Họ và Tên" required>
+                    <input type="email" name="email" placeholder="Email" required>
+                    <input type="text" name="phone" placeholder="Số điện thoại" required>
+                    <label for="avatar">Ảnh đại diện:</label>
+                    <input type="file" id="avatar" name="avatar" accept="image/*">
+                    <button type="submit">Thêm mới</button>
                 </form>
 
                 <h2>Danh sách sinh viên</h2>
@@ -225,6 +256,37 @@ initial-scale=1.0">
                     <?php endif; ?>
                 </tbody>
             </table>
+
+            <?php if (isset($totalPages) && $totalPages > 1): ?>
+                <div class="pagination">
+                    <?php
+                    $baseParams = [];
+                    if (!empty($keyword)) {
+                        $baseParams['keyword'] = $keyword;
+                    }
+                    ?>
+
+                    <?php if ($currentPage > 1): ?>
+                        <?php $prevParams = array_merge($baseParams, ['page' => $currentPage - 1]); ?>
+                        <a href="index.php?<?php echo http_build_query($prevParams); ?>">&laquo; Trước</a>
+                    <?php endif; ?>
+
+                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                        <?php $pageParams = array_merge($baseParams, ['page' => $i]); ?>
+                        <?php if ($i == $currentPage): ?>
+                            <span class="active"><?php echo $i; ?></span>
+                        <?php else: ?>
+                            <a href="index.php?<?php echo http_build_query($pageParams); ?>"><?php echo $i; ?></a>
+                        <?php endif; ?>
+                    <?php endfor; ?>
+
+                    <?php if ($currentPage < $totalPages): ?>
+                        <?php $nextParams = array_merge($baseParams, ['page' => $currentPage + 1]); ?>
+                        <a href="index.php?<?php echo http_build_query($nextParams); ?>">Sau &raquo;</a>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
+
             <script>
                 // Lấy tất cả các phần tử flash message
                 const flashMessages = document.querySelectorAll('.flash-message');

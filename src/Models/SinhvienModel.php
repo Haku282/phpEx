@@ -9,10 +9,46 @@ use PDO;
 class SinhvienModel
 {
     private $conn;
+    private $avatarColumn;
 
     public function __construct()
     {
         $this->conn = Database::getInstance()->getConnection();
+        $this->avatarColumn = null;
+    }
+
+    private function getAvatarColumnName()
+    {
+        if ($this->avatarColumn !== null) {
+            return $this->avatarColumn;
+        }
+
+        $stmt = $this->conn->query("SHOW COLUMNS FROM students");
+        $columns = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+        foreach (['avatar', 'avatars', 'avatas'] as $candidate) {
+            if (in_array($candidate, $columns, true)) {
+                $this->avatarColumn = $candidate;
+                return $this->avatarColumn;
+            }
+        }
+
+        $this->avatarColumn = false;
+        return $this->avatarColumn;
+    }
+
+    private function normalizeAvatarField(array $student)
+    {
+        if (!isset($student['avatar'])) {
+            $avatarColumn = $this->getAvatarColumnName();
+            if ($avatarColumn && isset($student[$avatarColumn])) {
+                $student['avatar'] = $student[$avatarColumn];
+            } else {
+                $student['avatar'] = null;
+            }
+        }
+
+        return $student;
     }
 
     // Lấy tất cả sinh viên 
@@ -50,6 +86,10 @@ class SinhvienModel
         );
         $stmtData->execute();
         $students = $stmtData->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($students as &$student) {
+            $student = $this->normalizeAvatarField($student);
+        }
+        unset($student);
         return [
             'data' => $students,
             'total' => $totalRecords
@@ -58,7 +98,12 @@ class SinhvienModel
     // Thêm sinh viên mới (bổ sung avatar)
     public function addStudent($name, $email, $phone, $avatar = null)
     {
-        $stmt = $this->conn->prepare("INSERT INTO students (name, email, phone, avatar) VALUES (:name, :email, :phone, :avatar)");
+        $avatarColumn = $this->getAvatarColumnName();
+        if ($avatarColumn) {
+            $stmt = $this->conn->prepare("INSERT INTO students (name, email, phone, {$avatarColumn}) VALUES (:name, :email, :phone, :avatar)");
+        } else {
+            $stmt = $this->conn->prepare("INSERT INTO students (name, email, phone) VALUES (:name, :email, :phone)");
+        }
 
         // Làm sạch dữ liệu 
         $name = htmlspecialchars(strip_tags($name));
@@ -70,7 +115,9 @@ class SinhvienModel
         $stmt->bindParam(':name', $name);
         $stmt->bindParam(':email', $email);
         $stmt->bindParam(':phone', $phone);
-        $stmt->bindValue(':avatar', $avatar, $avatar === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+        if ($avatarColumn) {
+            $stmt->bindValue(':avatar', $avatar, $avatar === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+        }
 
         if ($stmt->execute()) {
             return true;
@@ -80,21 +127,24 @@ class SinhvienModel
     // HÀM THÊM MỚI: Lấy thông tin một sinh viên theo ID (bài 03)
     public function getStudentById($id)
     {
-        $stmt = $this->conn->prepare("SELECT * FROM students
-
-WHERE id = :id");
+        $stmt = $this->conn->prepare("SELECT * FROM students WHERE id = :id");
 
         $stmt->bindParam(':id', $id);
         $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $student = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$student) {
+            return false;
+        }
+        return $this->normalizeAvatarField($student);
     }
     // HÀM THÊM MỚI: Cập nhật thông tin sinh viên (bài 03)
     public function updateStudent($id, $name, $email, $phone, $avatar = null)
     {
+        $avatarColumn = $this->getAvatarColumnName();
         // Nếu có avatar mới, cập nhật cả trường avatar; nếu không, giữ nguyên avatar cũ
-        if ($avatar !== null) {
+        if ($avatar !== null && $avatarColumn) {
             $stmt = $this->conn->prepare(
-                "UPDATE students SET name = :name, email = :email, phone = :phone, avatar = :avatar WHERE id = :id"
+                "UPDATE students SET name = :name, email = :email, phone = :phone, {$avatarColumn} = :avatar WHERE id = :id"
             );
         } else {
             $stmt = $this->conn->prepare(
@@ -111,7 +161,7 @@ WHERE id = :id");
         $stmt->bindParam(':name', $name);
         $stmt->bindParam(':email', $email);
         $stmt->bindParam(':phone', $phone);
-        if ($avatar !== null) {
+        if ($avatar !== null && $avatarColumn) {
             $avatarClean = htmlspecialchars(strip_tags($avatar));
             $stmt->bindParam(':avatar', $avatarClean);
         }
@@ -131,5 +181,17 @@ WHERE id = :id");
             return true;
         }
         return false;
+    }
+    public function getStatistics()
+    {
+        $sql = "
+                SELECT
+                COUNT(*) AS total_students,
+                SUM(CASE WHEN email LIKE '%@tdu.edu.vn' THEN 1 ELSE 0 END) AS edu_emails,
+                SUM(CASE WHEN phone LIKE '09%' THEN 1 ELSE 0 END)
+                AS sdt_09 FROM students";
+                        $stmt = $this->conn->prepare($sql);
+                        $stmt->execute();
+                        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 }

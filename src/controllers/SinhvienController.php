@@ -57,7 +57,7 @@ class SinhvienController
                 // Xử lý upload avatar nếu có
                 $avatarFilename = null;
                 if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
-                    $uploadDir = __DIR__ . '/../../upload/avatars/';
+                    $uploadDir = __DIR__ . '/../../public/upload/avatars/';
                     if (!is_dir($uploadDir)) {
                         mkdir($uploadDir, 0755, true);
                     }
@@ -98,6 +98,10 @@ class SinhvienController
         }
         // Gọi model để lấy thông tin sinh viên
         $student = $this->sinhvienModel->getStudentById($id);
+        if (!$student) {
+            header('Location: index.php');
+            exit();
+        }
         // Nạp file view để hiển thị form
         require_once __DIR__ . '/../../views/sinhvien_edit.php';
     }
@@ -120,7 +124,7 @@ class SinhvienController
 
                 $avatarFilename = null;
                 if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
-                    $uploadDir = __DIR__ . '/../../upload/avatars/';
+                    $uploadDir = __DIR__ . '/../../public/upload/avatars/';
                     if (!is_dir($uploadDir)) {
                         mkdir($uploadDir, 0755, true);
                     }
@@ -163,7 +167,7 @@ class SinhvienController
         if ($id) {
             // Xóa file avatar nếu tồn tại
             $existing = $this->sinhvienModel->getStudentById($id);
-            $uploadDir = __DIR__ . '/../../upload/avatars/';
+            $uploadDir = __DIR__ . '/../../public/upload/avatars/';
             if (!empty($existing['avatar']) && $existing['avatar'] !== 'default-avatar.png') {
                 $file = $uploadDir . $existing['avatar'];
                 if (is_file($file)) {
@@ -181,5 +185,12 @@ class SinhvienController
 
         header('Location: index.php');
         exit();
+    }
+    public function dashboard()
+    {
+        // Gọi model để lấy dữ liệu thống kê
+        $stats = $this->sinhvienModel->getStatistics();
+        // Nạp file view và truyền biến $stats ra
+        require_once __DIR__ . '/../../views/dashboard.php';
     }
 }

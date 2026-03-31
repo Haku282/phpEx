@@ -8,8 +8,24 @@ use vohoq\Bai01QuanlySv\Controllers\SinhvienController;
 use vohoq\Bai01QuanlySv\Controllers\UserController;
 // Simple Router 
 $action = $_GET['action'] ?? 'index';
+// Danh sách các action được bảo vệ (yêu cầu đăng nhập)
+$protected_actions = [
+    'index',
+    'edit',
+    'update',
+    'delete',
+    'add',
+    'dashboard'
+];
+if (
+    in_array($action, $protected_actions) &&
+    !isset($_SESSION['user_id'])
+) {
+    header('Location: index.php?action=login');
+    exit();
+}
 // Danh sách các action không yêu cầu đăng nhập
-$public_actions = ['login', 'register', 'do_login', 'do_register'];
+$public_actions = ['login', 'register', 'do_login', 'do_register',];
 // Khởi tạo controller dựa trên action
 if (in_array($action, [
     'login',
@@ -23,6 +39,9 @@ if (in_array($action, [
     $controller = new SinhvienController();
 }
 switch ($action) {
+    case 'dashboard':
+        $controller->dashboard();
+        break;
     case 'add':
         $controller->add();
         break;

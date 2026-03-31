@@ -50,31 +50,32 @@ initial-scale=1.0">
 </head>
 
 <body>
+    <?php $studentData = $student ?? []; ?>
     <div class="container">
         <h1>Chỉnh sửa thông tin sinh viên</h1>
         <div>
             <p>Ảnh đại diện hiện tại:</p>
-            <img src="upload/avatars/<?php echo $student['avatar'] ??
+            <img src="upload/avatars/<?php echo $studentData['avatar'] ??
                                             'default-avatar.png'; ?>" alt="Current Avatar" width="100" height="100">
         </div>
         <form action="index.php?action=update" method="POST" enctype="multipart/form-data">
             <input type="hidden" name="id" value="<?php echo
 
-                                                    $student['id']; ?>">
+                                                    $studentData['id'] ?? ''; ?>">
 
             <label for="name">Họ và Tên:</label>
             <input type="text" id="name" name="name"
-                value="<?php echo htmlspecialchars($student['name']); ?>"
+                value="<?php echo htmlspecialchars($studentData['name'] ?? ''); ?>"
                 required>
 
             <label for="email">Email:</label>
             <input type="email" id="email" name="email"
-                value="<?php echo htmlspecialchars($student['email']); ?>"
+                value="<?php echo htmlspecialchars($studentData['email'] ?? ''); ?>"
                 required>
 
             <label for="phone">Số điện thoại:</label>
             <input type="text" id="phone" name="phone"
-                value="<?php echo htmlspecialchars($student['phone']); ?>"
+                value="<?php echo htmlspecialchars($studentData['phone'] ?? ''); ?>"
                 required>
             <label for="avatar">Thay đổi ảnh đại diện:</label>
             <input type="file" id="avatar" name="avatar" accept="image/*">
