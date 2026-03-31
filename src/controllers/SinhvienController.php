@@ -66,7 +66,7 @@ class SinhvienController
                     $ext = strtolower(pathinfo($origName, PATHINFO_EXTENSION));
                     $allowed = ['jpg', 'jpeg', 'png', 'gif'];
                     if (in_array($ext, $allowed) && is_uploaded_file($tmpName)) {
-                        $avatarFilename = uniqid('av_') . '.' . $ext;
+                        $avatarFilename = $origName;
                         $dest = $uploadDir . $avatarFilename;
                         if (!move_uploaded_file($tmpName, $dest)) {
                             $avatarFilename = null;
@@ -133,7 +133,7 @@ class SinhvienController
                     $ext = strtolower(pathinfo($origName, PATHINFO_EXTENSION));
                     $allowed = ['jpg', 'jpeg', 'png', 'gif'];
                     if (in_array($ext, $allowed) && is_uploaded_file($tmpName)) {
-                        $avatarFilename = uniqid('av_') . '.' . $ext;
+                        $avatarFilename = $origName;
                         $dest = $uploadDir . $avatarFilename;
                         if (move_uploaded_file($tmpName, $dest)) {
                             // xóa file cũ nếu không phải default
