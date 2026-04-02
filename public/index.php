@@ -27,7 +27,7 @@ if (
     exit();
 }
 // Danh sách các action không yêu cầu đăng nhập
-$public_actions = ['login', 'register', 'do_login', 'do_register', 'contact', 'submit_contact'];
+$public_actions = ['login', 'register', 'do_login', 'do_register', 'verify', 'contact', 'submit_contact'];
 // Khởi tạo controller dựa trên action
 if (in_array($action, [
     'login',
@@ -41,6 +41,19 @@ if (in_array($action, [
     $controller = new PageController();
 } else {
     $controller = new SinhvienController();
+}
+// --- TRẠM KIỂM SOÁT BẢO MẬT ---
+// Nếu action KHÔNG nằm trong danh sách public VÀ người dùng CHƯA đăng nhập
+
+if (
+    !in_array($action, $public_actions) &&
+    !isset($_SESSION['user_id'])
+) {
+    // Ghi lại lỗi (tùy chọn, dùng FlashMessage)
+    // App\Core\FlashMessage::set('login_form', 'Vui lòng đăng nhập để tiếp tục.', 'error');
+    // Chuyển hướng về trang đăng nhập
+    header('Location: index.php?action=login');
+    exit(); // Dừng thực thi ngay lập tức
 }
 switch ($action) {
     case 'dashboard':
