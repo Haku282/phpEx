@@ -27,11 +27,28 @@ class SinhvienController
         $offset = ($currentPage - 1) * $recordsPerPage;
         // --- XỬ LÝ TÌM KIẾM ---
         $keyword = $_GET['keyword'] ?? null;
+        // --- XỬ LÝ SẮP XẾP (PHẦN MỚI) ---
+        // 1. Danh sách các cột được phép sắp xếp (để bảo mật)
+        $allowedSortCols = ['id', 'name', 'email', 'phone'];
+        // 2. Lấy cột sắp xếp từ URL, mặc định là 'id'
+        $sortby = $_GET['sortby'] ?? 'id';
+        if (!in_array($sortby, $allowedSortCols)) {
+            $sortby = 'id'; // Nếu cột không hợp lệ, quay về mặc định
+        }
+        // 3. Lấy thứ tự sắp xếp, mặc định là 'desc' (mới nhất lên đầu)
+        $order = $_GET['order'] ?? 'desc';
+        $order = strtolower($order) === 'asc' ? 'asc' : 'desc'; // Chỉ cho phép 'asc' hoặc 'desc'
+
+        // 4. Tính toán thứ tự đảo ngược (để dùng trong View)
+        $nextOrder = ($order === 'asc' ? 'desc' : 'asc');
+        // Truyền thêm $sortby và $order vào Model
         // --- GỌI MODEL ---
         $result = $this->sinhvienModel->getStudents(
             $keyword,
             $recordsPerPage,
-            $offset
+            $offset,
+            $sortby,
+            $order
         );
         $students = $result['data'];
         $totalRecords = $result['total'];

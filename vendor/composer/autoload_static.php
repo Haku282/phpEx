@@ -11,12 +11,20 @@ class ComposerStaticInit3b8e6e0a814b98508f23c310c23ed17a
         array (
             'vohoq\\Bai01QuanlySv\\' => 20,
         ),
+        'P' =>
+        array (
+            'PHPMailer\\PHPMailer\\' => 20,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
         'vohoq\\Bai01QuanlySv\\' =>
         array (
             0 => __DIR__ . '/../..' . '/src',
+        ),
+        'PHPMailer\\PHPMailer\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
         ),
     );
 

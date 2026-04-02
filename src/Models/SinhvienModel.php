@@ -52,7 +52,7 @@ class SinhvienModel
     }
 
     // Lấy tất cả sinh viên 
-    public function getStudents($keyword = null, $limit = 5, $offset = 0)
+    public function getStudents($keyword = null, $limit = 5, $offset = 0, $sortby = 'id', $order = 'desc')
     {
         // --- BƯỚC 1: ĐẾM TỔNG SỐ BẢN GHI ---
         $sqlCount = "SELECT COUNT(*) FROM students";
@@ -69,7 +69,14 @@ class SinhvienModel
         if ($keyword) {
             $sqlData .= " WHERE name LIKE :keyword OR email LIKE :keyword OR phone LIKE :keyword";
         }
-        $sqlData .= " ORDER BY id DESC LIMIT :limit OFFSET :offset";
+        
+        // THÊM LOGIC ORDER BY (PHẦN MỚI)
+        // Chúng ta đã validate $sortby và $order ở Controller
+        // nên ở đây có thể nối chuỗi an toàn.
+        $sqlData .= " ORDER BY " . $sortby . " " . $order;
+        // Thêm LIMIT và OFFSET
+        $sqlData .= " LIMIT :limit OFFSET :offset";
+        
         $stmtData = $this->conn->prepare($sqlData);
         // Gán các tham số cho câu lệnh lấy dữ liệu
         if ($keyword) {
@@ -202,8 +209,8 @@ class SinhvienModel
                 SUM(CASE WHEN email LIKE '%@tdu.edu.vn' THEN 1 ELSE 0 END) AS edu_emails,
                 SUM(CASE WHEN phone LIKE '09%' THEN 1 ELSE 0 END)
                 AS sdt_09 FROM students";
-                        $stmt = $this->conn->prepare($sql);
-                        $stmt->execute();
-                        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 }

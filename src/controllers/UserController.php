@@ -3,6 +3,8 @@
 namespace vohoq\Bai01QuanlySv\Controllers;
 
 use vohoq\Bai01QuanlySv\Models\UserModel;
+use vohoq\Bai01QuanlySv\Core\Mailer;
+use vohoq\Bai01QuanlySv\Core\FlashMessage;
 
 class UserController
 {
@@ -23,10 +25,11 @@ class UserController
             $name = $_POST['name'] ?? '';
             $username = $_POST['username'] ?? '';
             $password = $_POST['password'] ?? '';
+            $email = $_POST['email'] ?? '';
             if (
                 empty($name) || empty($username) ||
 
-                empty($password)
+                empty($password) || empty($email)
             ) {
 
                 $error = "Vui lòng điền đầy đủ thông tin.";
@@ -37,11 +40,33 @@ class UserController
                 $name,
 
                 $username,
-                $password
+                $password,
+                $email
             );
+
             if ($result) {
                 // Đăng ký thành công, chuyển hướng đến trang đăng nhập
+                $subject = "Chào mừng bạn đến với Ứng dụng Quản lý Sinh viên!";
 
+                $body = " <h1>Chào mừng, " . htmlspecialchars($name) . "!</h1>
+<p>Cảm ơn bạn đã đăng ký tài khoản tại ứng dụng của chúng tôi.</p>
+
+<p>Tên đăng nhập của bạn là: <strong>" .
+
+                    htmlspecialchars($username) . "</strong></p>
+
+<p>Trân trọng,<br>Ban quản trị</p>
+";
+                // Gọi hàm gửi mail
+                if (Mailer::send($email, $name, $subject, $body)) {
+                    FlashMessage::set('login_form', 'Đăng ký thành công!
+
+Vui lòng kiểm tra email để xác nhận.', 'success');
+                } else {
+                    FlashMessage::set('login_form', 'Đăng ký thành công,
+
+nhưng không thể gửi email xác nhận.', 'error');
+                }
                 header('Location: index.php?action=login');
                 exit();
             } else {
