@@ -13,6 +13,83 @@ class UserController
     {
         $this->userModel = new UserModel();
     }
+    /**
+     * HÀM MỚI: Hiển thị form đổi mật khẩu
+     */
+    public function showChangePasswordForm()
+    {
+        require_once __DIR__ . '/../../views/change_password.php';
+    }
+    /**
+     * HÀM MỚI: Xử lý logic đổi mật khẩu
+     */
+    public function handleChangePassword()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $old_password = $_POST['old_password'] ?? '';
+            $new_password = $_POST['new_password'] ?? '';
+            $confirm_password = $_POST['confirm_password'] ?? '';
+            $userId = $_SESSION['user_id']; // Lấy ID từ user đang đăng nhập
+
+            // 1. Kiểm tra các trường có trống không
+            if (
+                empty($old_password) || empty($new_password) ||
+
+                empty($confirm_password)
+            ) {
+
+                FlashMessage::set('change_pass_form', 'Vui lòng điền đầy đủ thông tin.', 'error');
+
+                header('Location: index.php?action=change_password');
+                exit();
+            }
+            // 2. Kiểm tra mật khẩu mới có khớp không
+            if ($new_password !== $confirm_password) {
+                FlashMessage::set('change_pass_form', 'Mật khẩu mới và xác nhận mật khẩu không khớp.', 'error');
+
+                header('Location: index.php?action=change_password');
+                exit();
+            }
+            // 3. Kiểm tra mật khẩu cũ có đúng không
+            $user = $this->userModel->findUserById($userId);
+            if (!$user || !password_verify(
+                $old_password,
+
+                $user['password']
+            )) {
+
+                FlashMessage::set('change_pass_form', 'Mật khẩu cũ không chính xác.', 'error');
+
+                header('Location: index.php?action=change_password');
+
+                exit();
+            }
+            // 4. Nếu mọi thứ OK, cập nhật mật khẩu mới
+            if ($this->userModel->updatePassword($userId, $new_password)) {
+
+                FlashMessage::set('student_action', 'Đổi mật khẩu thành công! Vui lòng đăng nhập lại.', 'success');
+
+                // Đăng xuất người dùng để họ đăng nhập lại với mật khẩu mới
+
+                $this->logoutAndRedirect();
+            } else {
+                FlashMessage::set('change_pass_form', 'Đã có lỗi xảy ra. Vui lòng thử lại.', 'error');
+
+                header('Location: index.php?action=change_password');
+                exit();
+            }
+        }
+    }
+    /**
+     * HÀM HELPER MỚI: Dùng riêng cho việc đổi mật khẩu
+     */
+    private function logoutAndRedirect()
+    {
+        session_unset();
+        session_destroy();
+        header('Location: index.php?action=login');
+        exit();
+    }
     // Hiển thị form đăng ký
     public function showRegisterForm()
     {
@@ -55,17 +132,12 @@ class UserController
 
                     htmlspecialchars($username) . "</strong></p>
 
-<p>Trân trọng,<br>Ban quản trị</p>
-";
+<p>Trân trọng,<br>Ban quản trị</p> ";
                 // Gọi hàm gửi mail
                 if (Mailer::send($email, $name, $subject, $body)) {
-                    FlashMessage::set('login_form', 'Đăng ký thành công!
-
-Vui lòng kiểm tra email để xác nhận.', 'success');
+                    FlashMessage::set('login_form', 'Đăng ký thành công! Vui lòng kiểm tra email để xác nhận.', 'success');
                 } else {
-                    FlashMessage::set('login_form', 'Đăng ký thành công,
-
-nhưng không thể gửi email xác nhận.', 'error');
+                    FlashMessage::set('login_form', 'Đăng ký thành công, nhưng không thể gửi email xác nhận.', 'error');
                 }
                 header('Location: index.php?action=login');
                 exit();
