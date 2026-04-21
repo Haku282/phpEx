@@ -58,8 +58,9 @@ class SinhvienModel
         $sqlCount = "SELECT COUNT(*) FROM students";
         $params = [];
         if ($keyword) {
-            $sqlCount .= " WHERE name LIKE :keyword OR email LIKE :keyword OR phone LIKE :keyword";
-            $params[':keyword'] = "%{$keyword}%";
+            $sqlCount .= " WHERE name LIKE :keyword_like OR email LIKE :keyword_like OR phone LIKE :keyword_phone";
+            $params[':keyword_like'] = "%{$keyword}%";
+            $params[':keyword_phone'] = "{$keyword}%";
         }
         $stmtCount = $this->conn->prepare($sqlCount);
         $stmtCount->execute($params);
@@ -67,23 +68,21 @@ class SinhvienModel
         // --- BƯỚC 2: LẤY DỮ LIỆU SINH VIÊN THEO PHÂN TRANG ---
         $sqlData = "SELECT * FROM  students";
         if ($keyword) {
-            $sqlData .= " WHERE name LIKE :keyword OR email LIKE :keyword OR phone LIKE :keyword";
+            $sqlData .= " WHERE name LIKE :keyword_like OR email LIKE :keyword_like OR phone LIKE :keyword_phone";
         }
-        
+
         // THÊM LOGIC ORDER BY (PHẦN MỚI)
         // Chúng ta đã validate $sortby và $order ở Controller
         // nên ở đây có thể nối chuỗi an toàn.
         $sqlData .= " ORDER BY " . $sortby . " " . $order;
         // Thêm LIMIT và OFFSET
         $sqlData .= " LIMIT :limit OFFSET :offset";
-        
+
         $stmtData = $this->conn->prepare($sqlData);
         // Gán các tham số cho câu lệnh lấy dữ liệu
         if ($keyword) {
-            $stmtData->bindParam(
-                ':keyword',
-                $params[':keyword']
-            );
+            $stmtData->bindParam(':keyword_like', $params[':keyword_like']);
+            $stmtData->bindParam(':keyword_phone', $params[':keyword_phone']);
         }
         $stmtData->bindParam(':limit', $limit, PDO::PARAM_INT);
         $stmtData->bindParam(
@@ -212,5 +211,21 @@ class SinhvienModel
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+    public function getStudentsForExport($keyword = null)
+    {
+
+        $sql = "SELECT * FROM students";
+        $params = [];
+        if ($keyword) {
+            $sql .= " WHERE name LIKE :keyword_like OR email LIKE :keyword_like OR phone LIKE :keyword_phone";
+            $params[':keyword_like'] = "%{$keyword}%";
+            $params[':keyword_phone'] = "{$keyword}%";
+        }
+        $sql .= " ORDER BY id ASC"; // Sắp xếp theo ID tăng dần cho file xuất
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

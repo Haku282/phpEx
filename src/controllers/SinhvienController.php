@@ -234,4 +234,57 @@ class SinhvienController
         // Nạp file view và truyền biến $stats ra
         require_once __DIR__ . '/../../views/dashboard.php';
     }
+    /**
+     * HÀM MỚI: Xử lý xuất danh sách sinh viên ra file CSV
+     */
+    public function exportCsv()
+    {
+        // 1. Lấy từ khóa tìm kiếm (nếu có)
+        $keyword = $_GET['keyword'] ?? null;
+        // 2. Lấy toàn bộ dữ liệu từ Model
+        $students = $this->sinhvienModel->getStudentsForExport($keyword);
+        // 3. Đặt tên file
+        $filename = "danh-sach-sinh-vien-" . date('Y-m-d') . ".csv";
+        // 4. Thiết lập HTTP Headers để trình duyệt hiểu là file tải về
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+
+        // 5. Mở luồng ghi "php://output"
+        // Luồng này cho phép ghi dữ liệu trực tiếp vào body của response
+        $output = fopen('php://output', 'w');
+        // 6. (QUAN TRỌNG) Thêm UTF-8 BOM
+        // Bước này rất cần thiết để Microsoft Excel đọc file CSV có tiếng Việt
+
+        fputs($output, "\xEF\xBB\xBF");
+        // 7. Ghi dòng tiêu đề (Header) của file CSV
+        fputcsv($output, [
+            'ID',
+            'Họ và Tên',
+            'Email',
+            'Số điện thoại',
+            'Khóa học',
+            'Lớp',
+            'Ngành học'
+        ]);
+        // 8. Lặp qua dữ liệu và ghi từng dòng
+
+        foreach ($students as $student) {
+            fputcsv($output, [
+                $student['id'],
+                $student['name'],
+                $student['email'],
+                $student['phone'],
+                $student['course'] ?? '', // Dùng ?? '' để tránh lỗi nếu giá trị là NULL
+
+                $student['class_name'] ?? '',
+                $student['major'] ?? ''
+            ]);
+        }
+        // 9. Đóng luồng
+        fclose($output);
+        // 10. Dừng chương trình
+        // Rất quan trọng, để ngăn không cho bất kỳ mã HTML/View nào
+        // bị chèn vào sau nội dung file CSV.
+        exit();
+    }
 }

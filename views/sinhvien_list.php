@@ -177,6 +177,12 @@ initial-scale=1.0">
                     <a href="index.php?action=dashboard" style="padding: 8px 12px;
                         background-color: #17a2b8; color: white; text-decoration: none;
                         border-radius: 3px;">Xem Thống kê</a>
+                    <a href="index.php?action=export_csv&keyword=<?php echo
+                                                                    urlencode($keyword ?? ''); ?>"
+                        style="padding: 8px 12px; background-color: #28a745;
+color: white; text-decoration: none; border-radius: 3px; margin-left: 10px;">
+                        Xuất CSV
+                    </a>
                 </form>
                 <table>
                 </table>
@@ -219,11 +225,17 @@ initial-scale=1.0">
                             htmlspecialchars($student['email']); ?></td>
                         <td><?php echo
                             htmlspecialchars($student['phone']); ?></td>
+                        <td><?php echo
+                            htmlspecialchars($student['course']); ?></td>
+                        <td><?php echo
+                            htmlspecialchars($student['class_name']); ?></td>
+                        <td><?php echo
+                            htmlspecialchars($student['major']); ?></td>
                     </tr>
                 <?php endforeach; ?>
                 <?php if (empty($students)): ?>
                     <tr>
-                        <td colspan="4">Chưa có sinh viên
+                        <td colspan="7">Chưa có sinh viên
                             nào.</td>
                     </tr>
                 <?php endif; ?>
@@ -304,6 +316,9 @@ sort-' . $order : '';
                                     class="sort-arrow"></span>
                             </a>
                         </th>
+                        <th>Khóa học</th>
+                        <th>Lớp học</th>
+                        <th>Ngành học</th>
 
                         <th>Hành động</th>
                     </tr>
@@ -357,7 +372,7 @@ sort-' . $order : '';
                     <?php endforeach; ?>
                     <?php if (empty($students)): ?>
                         <tr>
-                            <td colspan="5">Chưa có sinh viên nào.</td>
+                            <td colspan="9">Chưa có sinh viên nào.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
