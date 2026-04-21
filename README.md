@@ -1,43 +1,58 @@
-Bài 1
-Luồng hoạt động của ứng dụng
-1. Người dùng truy cập link web .../public/index.php.
-2. index.php (Front Controller) được chạy.
-3. Nó kiểm tra $_GET['action']. Mặc định là index.
-4. Nó tạo một SinhvienController.
-5. Nó gọi phương thức index() của controller.
-6. index() gọi getAllStudents() từ SinhvienModel để lấy dữ liệu từ CSDL.
-7. index() nạp file views/student_list.php và truyền dữ liệu sinh viên vào để hiển thị.
-8. Khi người dùng submit form, họ được gửi đến .../public/index.php?action=add.
-9. Front Controller sẽ gọi phương thức add() của controller.
-10. add() lấy dữ liệu từ $_POST, gọi addStudent() trong Model để lưu vào CSDL.
-11.Sau khi lưu, add() chuyển hướng người dùng về lại trang chủ.
+# 🎓 Hệ Thống Quản Lý Sinh Viên (Student Management System)
 
-Bài 2-3
-Kiến thức cần nắm trong bài thực hành này:
-● Cách truyền tham số (id) qua URL.
-● Viết câu lệnh SQL SELECT ... WHERE để lấy một bản ghi duy nhất.
-● Sử dụng thẻ <input type="hidden"> để gửi dữ liệu ẩn trong form
-sinhvien_edit.php.
-● Viết câu lệnh SQL UPDATE để chỉnh sửa dữ liệu đã có.
+Dự án PHP quản lý sinh viên được viết theo mô hình kiến trúc **MVC (Model-View-Controller)** và **Front Controller**, sử dụng PDO để tương tác với cơ sở dữ liệu MySQL, và quản lý thư viện thông qua **Composer**.
 
-Bài 4
-Sau 4 bài thực hành, các em đã nắm vững các kiến thức sau:
-❖ Sử dụng Composer để quản lý dự án và tự động nạp class.
-❖ Tổ chức code theo cấu trúc gần giống mô hình MVC (Model-View-Controller).
-❖ Tương tác với cơ sở dữ liệu MySQL một cách an toàn bằng PDO và Prepared
-Statements.
-❖ Xây dựng các chức năng Create, Read, Update, Delete.
-❖ Xử lý form, tham số trên URL và chuyển hướng trang.
+## ✨ Các Chức Năng Nổi Bật
 
-Bài 5
-Tóm tắt luồng hoạt động
-1. Người dùng nhập tên vào form tìm kiếm và nhấn Enter.
-2. Trình duyệt gửi yêu cầu GET đến index.php với tham số keyword trên URL.
-3. Router (index.php) gọi phương thức index() của SinhvienController.
-4. SinhvienController lấy keyword từ $_GET và gọi getAllStudents($keyword) trong
-SinhvienModel.
-5. SinhvienModel xây dựng câu lệnh SQL với WHERE name LIKE ... và thực thi để
-lấy kết quả.
-6. SinhvienController nhận kết quả và truyền nó cùng với $keyword cho
-sinhvien_list.php view.
-7. View hiển thị danh sách kết quả và điền lại $keyword vào ô tìm kiếm.
+- **Xác thực người dùng:** Đăng nhập, Đăng ký, Đăng xuất, Đổi mật khẩu.
+- **Quản lý danh sách sinh viên (CRUD):** Thêm, Sửa, Xóa và Xem chi tiết thông tin sinh viên.
+- **Upload Ảnh Đại Diện:** Hỗ trợ tải lên và hiển thị ảnh đại diện (Avatar) cho từng sinh viên.
+- **Tìm kiếm thông minh:** Tìm kiếm sinh viên linh hoạt theo Tên, Email hoặc Số điện thoại (tìm kiếm theo đầu số).
+- **Phân trang & Sắp xếp:** Hỗ trợ phân trang danh sách và sắp xếp linh động theo từng cột dữ liệu (ID, Tên, Email, SĐT, ...).
+- **Thống kê / Dashboard:** Xem tổng quan và thống kê ứng dụng.
+- **Xuất dữ liệu:** Export danh sách sinh viên dưới dạng file CSV.
+- **Thông báo Email:** Tích hợp PHPMailer để gửi email thông báo từ hệ thống.
+- **Flash Messages:** Thông báo trạng thái thao tác (Thêm thành công, Lỗi...) trực quan trên giao diện.
+
+## 🛠 Công Nghệ Sử Dụng
+
+- **Ngôn ngữ:** PHP (Thuần / Hướng đối tượng OOP)
+- **Cơ sở dữ liệu:** MySQL (sử dụng PHP Data Objects - PDO chống SQL Injection)
+- **Quản lý dependencies:** Composer (PSR-4 Autoloading)
+- **Kiến trúc:** Mô hình MVC (Controllers, Models, Views) + Front-Controller Pattern (`index.php`)
+- **Thư viện bên thứ 3:** [PHPMailer](https://github.com/PHPMailer/PHPMailer) (quản lý qua Composer)
+
+## 🚀 Hướng Dẫn Cài Đặt
+
+> **Lưu ý:** Xem chi tiết các yêu cầu về môi trường (PHP, MySQL, Extensions) tại file `requirements.txt` trong mã nguồn.
+
+1. **Clone dự án (hoặc tải mã nguồn):**
+   Đưa mã nguồn vào thư mục `htdocs` của XAMPP (ví dụ: `C:\xampp\htdocs\bai01_quanly_sv`).
+
+2. **Cài đặt thư viện:**
+   Mở terminal tại thư mục gốc của dự án (`bai01_quanly_sv`) và chạy lệnh sau để tải PHPMailer và thiết lập PSR-4 Autoload:
+   ```bash
+   composer install
+   ```
+   *(Đảm bảo máy tính đã cài đặt sẵn Composer).*
+
+3. **Cấu hình Cơ sở dữ liệu:**
+   - Tạo CSDL MySQL có tên là `quanlysinhvien` (sử dụng phpMyAdmin hoặc MySQL CLI).
+   - Kiểm tra và thay đổi thông tin kết nối DB (Tên đăng nhập, mật khẩu) trong file `src/Database.php` nếu cần thiết (Mặc định: host: `localhost`, username: `root`, password: rỗng).
+
+4. **Cấu hình Email (Tùy chọn):**
+   - Mở file `config.php` tại thư mục gốc để cập nhật lại thông tin tài khoản SMTP (`MAIL_USERNAME`, `MAIL_PASSWORD` ứng dụng 16 ký tự) nếu bạn muốn test tính năng gửi mail.
+
+5. **Chạy ứng dụng:**
+   - Bật Apache và MySQL thông qua XAMPP Control Panel.
+   - Mở trình duyệt và truy cập: `http://localhost/bai01_quanly_sv/public/index.php`
+
+---
+
+## 📂 Luồng Hoạt Động (Cơ bản)
+
+1. Client gửi request tới `public/index.php` (Front Controller).
+2. `index.php` phân tích URL (ví dụ: `?action=add`), gọi `Controller` tương ứng (VD: `SinhvienController`, `UserController`).
+3. `Controller` tiếp nhận nghiệp vụ, gọi tới `Model` để lấy/cập nhật dữ liệu từ Database.
+4. `Model` trả dữ liệu lại cho `Controller`.
+5. `Controller` load file `View` tương ứng trong thư mục `views/` và truyền dữ liệu ra giao diện HTML để hiển thị cho người dùng.
