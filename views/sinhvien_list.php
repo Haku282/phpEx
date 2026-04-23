@@ -6,8 +6,7 @@ use vohoq\Bai01QuanlySv\Core\FlashMessage; ?>
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, 
-initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản lý sinh viên</title>
     <style>
         body {
@@ -425,6 +424,10 @@ sort-' . $order : '';
                     }, 5000); // 5000 milliseconds = 5 giây
                 }
             </script>
+            <?php
+            // NẠP FOOTER
+            require_once __DIR__ . '/../views/layout/footer.php';
+            ?>
 </body>
 
 </html>
