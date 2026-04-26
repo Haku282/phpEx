@@ -69,7 +69,7 @@
 
 <div class="profile-card">
     <div class="profile-header">
-        <img src="uploads/avatars/<?php echo $student['avatar'] ?? 'default-avatar.png'; ?>" alt="Avatar">
+        <img src="upload/avatars/<?php echo $student['avatar'] ?? 'default-avatar.png'; ?>" alt="Avatar">
         <h1><?php echo htmlspecialchars($student['name']); ?></h1>
         <p><?php echo htmlspecialchars($student['major'] ?? 'Chưa cập nhật ngành học'); ?></p>
     </div>

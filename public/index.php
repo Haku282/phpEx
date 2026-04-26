@@ -3,10 +3,12 @@
 session_start();
 // Nạp file autoload của Composer 
 require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../views/layout/header.php';
 
 use vohoq\Bai01QuanlySv\Controllers\SinhvienController;
 use vohoq\Bai01QuanlySv\Controllers\UserController;
 use vohoq\Bai01QuanlySv\Controllers\PageController;
+use vohoq\Bai01QuanlySv\Controllers\AdminController; // <-- THÊM DÒNG NÀY
 // Simple Router 
 $action = $_GET['action'] ?? 'index';
 // Danh sách các action được bảo vệ (yêu cầu đăng nhập)
@@ -20,7 +22,8 @@ $protected_actions = [
     'detail',
     'change_password',
     'do_change_password',
-    'export_csv'
+    'export_csv',
+    'logs'
 ];
 if (
     in_array($action, $protected_actions) &&
@@ -44,6 +47,8 @@ if (in_array($action, [
     $controller = new UserController();
 } elseif (in_array($action, ['contact', 'submit_contact'])) { // <--THÊM ELSEIF
     $controller = new PageController();
+} elseif (in_array($action, ['logs'])) { // <-- THÊM ELSEIF MỚI
+    $controller = new AdminController();
 } else {
     $controller = new SinhvienController();
 }
@@ -115,6 +120,10 @@ switch ($action) {
     // THÊM CASE MỚI
     case 'export_csv':
         $controller->exportCsv();
+        break;
+    // THÊM CASE MỚI
+    case 'logs':
+        $controller->showLogs();
         break;
     default:
         $controller = new SinhvienController();

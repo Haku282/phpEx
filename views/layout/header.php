@@ -179,21 +179,29 @@ function isActive($action, $current_action)
     <nav class="navbar">
         <ul class="nav-links">
             <li>
-                <a href="index.php" class="<?php echo isActive('index', $current_action);
+                <a href="index.php" class="<?php echo isActive(
+                                                'index',
 
-                                            ?>">Danh sách Sinh viên</a>
+                                                $current_action
+                                            ); ?>">Danh sách Sinh viên</a>
+
             </li>
             <li>
                 <a href="index.php?action=dashboard" class="<?php echo
 
                                                             isActive('dashboard', $current_action); ?>">Dashboard</a>
+
             </li>
             <li>
-                <a href="index.php?action=contact" class="<?php echo isActive(
-                                                                'contact',
+                <a href="index.php?action=logs" class="<?php echo
+                                                        isActive('logs', $current_action); ?>">Log Hoạt Động</a>
 
-                                                                $current_action
-                                                            ); ?>">Liên hệ</a>
+            </li>
+            <li>
+                <a href="index.php?action=contact" class="<?php echo
+
+                                                            isActive('contact', $current_action); ?>">Liên hệ</a>
+
             </li>
         </ul>
         <div class="user-menu" id="user-menu-dropdown">
@@ -208,4 +216,4 @@ function isActive($action, $current_action)
             </div>
         </div>
     </nav>
-    <div class="container"></div>
+    <div class="container">

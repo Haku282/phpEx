@@ -4,6 +4,7 @@ namespace vohoq\Bai01QuanlySv\Controllers;
 
 use vohoq\Bai01QuanlySv\Models\SinhvienModel;
 use vohoq\Bai01QuanlySv\Core\FlashMessage;
+use vohoq\Bai01QuanlySv\Core\Logger; //<-- THÊM DÒNG NÀY
 
 class SinhvienController
 {
@@ -95,6 +96,7 @@ class SinhvienController
                 }
 
                 $this->sinhvienModel->addStudent($name, $email, $phone, $course, $class_name, $major, $avatarFilename);
+                Logger::log('create_student', "Student Name: " . $name); // <-- GHI LOG
 
                 // Đặt thông báo thành công
                 FlashMessage::set('student_action', 'Thêm sinh viên thành công!', 'success');
@@ -173,7 +175,7 @@ class SinhvienController
                 }
 
                 $this->sinhvienModel->updateStudent($id, $name, $email, $phone, $course, $class_name, $major, $avatarFilename);
-
+                Logger::log('update_student', "Student ID: " . $id); // <-- GHI LOG
                 FlashMessage::set('student_action', 'Cập nhật thông tin thành công!', 'success');
             } else {
                 FlashMessage::set('student_action', 'Cập nhật thất bại!', 'error');
@@ -199,6 +201,7 @@ class SinhvienController
             }
 
             if ($this->sinhvienModel->deleteStudent($id)) {
+                Logger::log('delete_student', "Student ID: " . $id); // <-- GHI LOG
                 FlashMessage::set('student_action', 'Xóa sinh viên thành công!', 'success');
             } else {
                 FlashMessage::set('student_action', 'Xóa thất bại!', 'error');

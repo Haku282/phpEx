@@ -5,6 +5,7 @@ namespace vohoq\Bai01QuanlySv\Controllers;
 use vohoq\Bai01QuanlySv\Models\UserModel;
 use vohoq\Bai01QuanlySv\Core\Mailer;
 use vohoq\Bai01QuanlySv\Core\FlashMessage;
+use vohoq\Bai01QuanlySv\Core\Logger;
 
 class UserController
 {
@@ -66,6 +67,7 @@ class UserController
             }
             // 4. Nếu mọi thứ OK, cập nhật mật khẩu mới
             if ($this->userModel->updatePassword($userId, $new_password)) {
+                Logger::log('password_change_success'); // <-- GHI LOG
 
                 FlashMessage::set('student_action', 'Đổi mật khẩu thành công! Vui lòng đăng nhập lại.', 'success');
 
@@ -186,6 +188,7 @@ class UserController
 
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_name'] = $user['name'];
+                Logger::log('login_success'); // <-- GHI LOG
                 // Chuyển hướng đến trang quản lý sinh viên
                 header('Location: index.php');
                 exit();
@@ -200,6 +203,7 @@ class UserController
     // HÀM MỚI: Xử lý đăng xuất
     public function logout()
     {
+        Logger::log('logout'); // <-- GHI LOG (trước khi hủy session)
         // Hủy tất cả các biến session.
         $_SESSION = [];
         // Nếu muốn hủy session hoàn toàn, hãy xóa cả cookie session.
